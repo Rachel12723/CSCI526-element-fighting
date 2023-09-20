@@ -6,9 +6,20 @@ public class StepBehaviorScript : MonoBehaviour
 {
     private Camera mainCamera;
 
+    void Awake()
+    {
+        Debug.Log("StepBehavior - Awake");
+    }
+
+    void OnEnable()
+    {
+        Debug.Log("StepBehavior - OnEnable");
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("StepBehavior - Start");
         mainCamera = Camera.main;
     }
 
