@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rigidbody;
     private bool canJump = false;
 
+    public int n;
     public KeyCode colorKey;
     private SpriteRenderer spriteRenderer;
 
@@ -22,7 +23,6 @@ public class PlayerController : MonoBehaviour
     {
         rigidbody = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        int n = UnityEngine.Random.Range(0, 3);
         if (n == 0)
         {
             spriteRenderer.color = Color.red;
@@ -35,7 +35,6 @@ public class PlayerController : MonoBehaviour
         {
             spriteRenderer.color = Color.blue;
         }
-        Collider2D collider = GetComponent<Collider2D>();
     }
 
     // Update is called once per frame
