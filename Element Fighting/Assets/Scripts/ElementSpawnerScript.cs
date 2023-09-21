@@ -18,18 +18,28 @@ public class ElementSpawnerScript : MonoBehaviour
     }
 
     // This method will receive the elements currently assigned to the players
-    public GameObject TrySpawnElementOnStep(GameObject step, List<string> playerElements)
+    public GameObject TrySpawnElementOnStep(GameObject step, List<Element> playerElements)
     {
         // configure at inspector: drag all element prefab here
-        List<GameObject> availableElements = new List<GameObject>(allElementPrefabs);
+        //List<GameObject> availableElements = new List<GameObject>(allElementPrefabs);
 
 
         // Remove the elements that are currently assigned to players
-        for (int i = availableElements.Count - 1; i >= 0; i--)
+        /* for (int i = availableElements.Count - 1; i >= 0; i--)
         {
-            if (playerElements.Contains(availableElements[i].name))
+            if (playerElements.Contains(availableElements[i].))
             {
                 availableElements.RemoveAt(i);
+            }
+        } */
+
+
+        List<Element> availableElements = new List<Element>();
+        foreach(Element element in Element.GetValues(typeof(Element)))
+        {
+            if (!playerElements.Contains(element))
+            {
+                availableElements.Add(element);
             }
         }
 
@@ -40,7 +50,7 @@ public class ElementSpawnerScript : MonoBehaviour
         {
             // Not useful rn, implemented for potentially adding more element, but plz dont do it!!!
             int randomIndex = UnityEngine.Random.Range(0, availableElements.Count);
-            GameObject elementToSpawn = availableElements[randomIndex];
+            GameObject elementToSpawn = allElementPrefabs[(int)availableElements[randomIndex]];
 
             float stepColliderHeight = step.GetComponent<BoxCollider2D>().size.y;
             float elementColliderRadius = elementToSpawn.GetComponent<CircleCollider2D>().radius;

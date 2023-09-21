@@ -10,40 +10,42 @@ public class PlayerController : MonoBehaviour
 
     public float jumpForce = 6;
     public KeyCode jumpKey;
-    private Rigidbody2D rigidbody;
+    private new Rigidbody2D rigidbody;
     private bool canJump = false;
 
-    public int n;
-    public KeyCode colorKey;
     private SpriteRenderer spriteRenderer;
+    public Element element;
 
+
+    public void changeElement(Element element)
+    {
+        this.element = element;
+        if (element == Element.Fire)
+        {
+            spriteRenderer.color = Color.red;
+        }
+        else if (element == Element.Wood)
+        {
+            spriteRenderer.color = Color.green;
+        }
+        else if (element == Element.Water)
+        {
+            spriteRenderer.color = Color.blue;
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         rigidbody = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        if (n == 0)
-        {
-            spriteRenderer.color = Color.red;
-        }
-        else if (n==1) 
-        {
-            spriteRenderer.color = Color.green;
-        }
-        else
-        {
-            spriteRenderer.color = Color.blue;
-        }
     }
 
     // Update is called once per frame
     void Update()
     {
 
-        // rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
-
-        // Move lsft/right
+        // Move left/right
         horizontalInput = Input.GetAxis("Horizontal"+inputID);
         transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput);
 
@@ -53,32 +55,16 @@ public class PlayerController : MonoBehaviour
             canJump = false;
             rigidbody.velocity = new Vector2(0, jumpForce);
         }
-
-        // Color change
-        if (Input.GetKeyDown(colorKey))
-        {
-            if (spriteRenderer.color==Color.red)
-            {
-                spriteRenderer.color = Color.blue;
-            }
-            else if(spriteRenderer.color == Color.blue)
-            {
-                spriteRenderer.color = Color.green;
-            }
-            else if (spriteRenderer.color == Color.green)
-            {
-                spriteRenderer.color = Color.red;
-            }
-        }
     }
 
+    // When on the platform, player can jump
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
             foreach (ContactPoint2D contact in collision.contacts)
             {
-                if (contact.normal.y>0)
+                if (contact.normal.y > 0)
                 {
                     canJump = true;
                 }
@@ -86,6 +72,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // When leaving the platform, player cannot jump
     void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Platform"))

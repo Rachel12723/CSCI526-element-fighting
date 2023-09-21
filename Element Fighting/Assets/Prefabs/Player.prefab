@@ -141,3 +141,4 @@ MonoBehaviour:
   jumpForce: 6
   jumpKey: 0
   colorKey: 0
+  element: 0

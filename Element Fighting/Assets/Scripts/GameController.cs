@@ -33,10 +33,10 @@ public class GameController : MonoBehaviour
     private void HandleStepSpawned(GameObject step)
     {
         // Get the currently assigned player elements
-        List<string> playerElements = new List<string>
+        List<Element> playerElements = new List<Element>
         {
-            player1.GetComponent<PlayerElementScript>().playerElement,
-            player2.GetComponent<PlayerElementScript>().playerElement
+            player1.GetComponent<PlayerController>().element,
+            player2.GetComponent<PlayerController>().element
         };
 
         // Ask the ElementSpawnerScript to try adding an element to this step
@@ -106,10 +106,17 @@ public class GameController : MonoBehaviour
 			if (distance1 < disappearDistance || distance2 < disappearDistance)
 			{
 				// destroy the one that is near to the player and update the stepElementPairs
-				Destroy(element);
+                if (distance1 < disappearDistance)
+                {
+                    player1.GetComponent<PlayerController>().changeElement(element.GetComponent<ElementScript>().elementType);
+                }
+                else if(distance2 < disappearDistance)
+                {
+                    player2.GetComponent<PlayerController>().changeElement(element.GetComponent<ElementScript>().elementType);
+                }
 				stepElementPairs.Remove(step);
-
-			}
+				Destroy(element);
+            }
 		}
 		
     }
