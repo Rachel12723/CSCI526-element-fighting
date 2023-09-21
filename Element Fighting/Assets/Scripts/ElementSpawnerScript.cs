@@ -45,7 +45,7 @@ public class ElementSpawnerScript : MonoBehaviour
             float stepColliderHeight = step.GetComponent<BoxCollider2D>().size.y;
             float elementColliderRadius = elementToSpawn.GetComponent<CircleCollider2D>().radius;
 
-            Vector3 spawnPosition = step.transform.position + new Vector3(0, stepColliderHeight / 2 + elementColliderRadius * 2, 0);
+            Vector3 spawnPosition = step.transform.position + new Vector3(0, stepColliderHeight / 2 + elementColliderRadius, 0);
             spawnedElement = Instantiate(elementToSpawn, spawnPosition, Quaternion.identity);
         }
 
