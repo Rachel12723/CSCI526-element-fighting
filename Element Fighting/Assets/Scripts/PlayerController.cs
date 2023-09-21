@@ -15,8 +15,7 @@ public class PlayerController : MonoBehaviour
 
     public KeyCode colorKey;
     private SpriteRenderer spriteRenderer;
-
-
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +35,8 @@ public class PlayerController : MonoBehaviour
             spriteRenderer.color = Color.blue;
         }
         Collider2D collider = GetComponent<Collider2D>();
+        
+        
     }
 
     // Update is called once per frame
@@ -44,7 +45,7 @@ public class PlayerController : MonoBehaviour
 
         // rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
 
-        // Move lsft/right
+        // Move left/right
         horizontalInput = Input.GetAxis("Horizontal"+inputID);
         transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput);
 
@@ -85,5 +86,10 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+        
+        
     }
+    
+    
+    
 }

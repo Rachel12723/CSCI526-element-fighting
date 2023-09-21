@@ -5,6 +5,11 @@ using UnityEngine;
 public class PlayerElementScript : MonoBehaviour
 {
     public string playerElement;
+    
+    // player eats object
+    private Color originalColor;
+    private bool hasEaten = false;
+    private bool canEat = true;
 
     // This method allows external scripts (eg. ElementSpawnerScript) to change the player's element
     public void ChangeElement(string newElement)
@@ -19,6 +24,7 @@ public class PlayerElementScript : MonoBehaviour
     void Start()
     {
         
+        
     }
 
     // Update is called once per frame
@@ -26,4 +32,6 @@ public class PlayerElementScript : MonoBehaviour
     {
         
     }
+    
+    
 }

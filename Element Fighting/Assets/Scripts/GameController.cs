@@ -8,12 +8,16 @@ public class GameController : MonoBehaviour
     public ElementSpawnerScript elementSpawner;
     public GameObject player1;
     public GameObject player2;
+	
 
     // Dictionary to track relationships between steps and their spawned elements
     private Dictionary<GameObject, GameObject> stepElementPairs = new Dictionary<GameObject, GameObject>();
+	// Store elements' positions in the screen view
+	private List<Transform> elementPositions = new List<Transform>();
 
     // Offset to position the element above the step
-    private float offset = 0.5f; 
+    private float offset = 0.9f; 
+	private float disappearDistance = 0.9f; 
 
 
     void Awake()
@@ -64,6 +68,7 @@ public class GameController : MonoBehaviour
 
             // Update the element's position based on the step's position
             element.transform.position = step.transform.position + Vector3.up * offset;
+			// elementPositions,add(element.transform);
         }
 
         // Remove any steps marked for removal from the dictionary
@@ -89,5 +94,23 @@ public class GameController : MonoBehaviour
     void Update()
     {
         UpdateElementPositions();
+		foreach (var pair in stepElementPairs)
+        {
+			GameObject step = pair.Key;
+            GameObject element = pair.Value;
+			
+			// calculate the distance between players and each element
+            float distance1 = Vector3.Distance(player1.transform.position, element.transform.position);
+			float distance2 = Vector3.Distance(player2.transform.position, element.transform.position);
+			
+			if (distance1 < disappearDistance || distance2 < disappearDistance)
+			{
+				// destroy the one that is near to the player and update the stepElementPairs
+				Destroy(element);
+				stepElementPairs.Remove(step);
+
+			}
+		}
+		
     }
 }
