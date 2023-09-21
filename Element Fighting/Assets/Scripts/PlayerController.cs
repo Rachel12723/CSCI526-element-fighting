@@ -86,4 +86,12 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Platform"))
+        {
+            canJump = false;
+        }
+    }
 }
