@@ -39,13 +39,16 @@ public class GameController : MonoBehaviour
             player2.GetComponent<PlayerController>().element
         };
 
-        // Ask the ElementSpawnerScript to try adding an element to this step
-        GameObject spawnedElement = elementSpawner.TrySpawnElementOnStep(step, playerElements);
-
-        // If an element was spawned, register the relationship
-        if (spawnedElement != null)
+        if (stepElementPairs.Count == 0)
         {
-            RegisterStepElementPair(step, spawnedElement);
+            // Ask the ElementSpawnerScript to try adding an element to this step
+            GameObject spawnedElement = elementSpawner.TrySpawnElementOnStep(step, playerElements);
+
+            // If an element was spawned, register the relationship
+            if (spawnedElement != null)
+            {
+                RegisterStepElementPair(step, spawnedElement);
+            }
         }
     }
 

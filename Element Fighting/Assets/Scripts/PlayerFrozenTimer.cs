@@ -1,18 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
 
-public class PlayerIndicator : MonoBehaviour
+public class PlayerFrozenTimer : MonoBehaviour
 {
     public Transform target;
+    public float freezeLeft = 0;
 
-    // Start is called before the first frame update
+
     void Start()
     {
+
     }
 
-    // Update is called once per frame
     void Update()
     {
         // 获取目标物体的世界坐标
@@ -21,7 +22,11 @@ public class PlayerIndicator : MonoBehaviour
         // 将目标物体的世界坐标转换为屏幕坐标
         Vector2 screenPosition = Camera.main.WorldToScreenPoint(targetPosition);
 
-        // 更新UI Text的位置
-        GetComponent<RectTransform>().position = screenPosition + new Vector2(80, 50);
+        GetComponent<RectTransform>().position = screenPosition + new Vector2(0, 35);
+        if (freezeLeft > 0)
+        {
+            freezeLeft -= Time.deltaTime;
+            GetComponent<Slider>().value = freezeLeft;
+        }
     }
 }
