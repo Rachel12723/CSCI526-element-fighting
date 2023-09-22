@@ -24,9 +24,6 @@ public class StepSpawnerScript : MonoBehaviour
         // Calculate half width of the step so that step won't appear cutoff at edge
         stepHalfWidth = stepPrefab.GetComponent<SpriteRenderer>().bounds.size.x / 2;
 
-        // Initialize first steps
-        InstantiateStepAtPosition(new Vector2(-2, 0));
-        InstantiateStepAtPosition(new Vector2(2, 0));
     }
 
     private void Update()
@@ -46,7 +43,7 @@ public class StepSpawnerScript : MonoBehaviour
         InstantiateStepAtPosition(spawnPosition);
     }
 
-    private void InstantiateStepAtPosition(Vector2 position)
+    public void InstantiateStepAtPosition(Vector2 position)
     {
         GameObject step = Instantiate(stepPrefab, position, Quaternion.identity);
 

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,80 +11,181 @@ public class PlayerController : MonoBehaviour
 
     public float jumpForce = 6;
     public KeyCode jumpKey;
-    private Rigidbody2D rigidbody;
-    private bool canJump = false;
+    private new Rigidbody2D rigidbody;
+    private bool jumpStatus = false;
 
-    public KeyCode colorKey;
     private SpriteRenderer spriteRenderer;
+    public Element element;
+    public List<Sprite> elementSprites;
 
+    public float freezeDuration = 2;
+    private float freezeLeft = 0;
+    private bool freezeStatus = false;
+    public GameObject freezeSlider;
+
+    public float invincibleDuration = 2;
+    private float invincibleLeft = 0;
+    private bool invincibleStatus = false;
+    private bool invincibleBlink = false;
+
+
+    public void init()
+    {
+        jumpStatus = false;
+        freezeLeft = 0;
+        freezeStatus = false;
+        invincibleLeft = 0;
+        invincibleStatus = false;
+        invincibleBlink = false;
+    }
+
+    private void blink()
+    {
+        Color color = spriteRenderer.color;
+        if (color.a >= 1f)
+        {
+            invincibleBlink = false;
+        }
+        if(color.a <= 0.3f)
+        {
+            invincibleBlink = true;
+        }
+        if (invincibleBlink)
+        {
+            color.a += Time.deltaTime * 2.1f;
+        }
+        else
+        {
+            color.a -= Time.deltaTime * 2.1f;
+        }
+        spriteRenderer.color = color;
+    }
+
+    private void stopBlink()
+    {
+        Color color = spriteRenderer.color;
+        color.a = 1f;
+        spriteRenderer.color = color;
+    }
+
+    private void freeze(Element element1,Element element2)
+    {
+        if(!invincibleStatus && !freezeStatus && ((element1==Element.Fire && element2 == Element.Water)|| (element1 == Element.Wood && element2 == Element.Fire)|| (element1 == Element.Water && element2 == Element.Wood)))
+        {
+            freezeLeft = freezeDuration;
+            freezeSlider.GetComponent<PlayerFrozenTimer>().freezeLeft = freezeDuration;
+            freezeStatus = true;
+            invincibleLeft = invincibleDuration;
+            invincibleStatus = true;
+        }
+    }
+
+    public void changeElement(Element element)
+    {
+        this.element = element;
+        Transform childObject = transform.GetChild(0);
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (element == Element.Fire)
+        {
+            spriteRenderer.color = Color.red;
+            childObject.GetComponent<SpriteRenderer>().sprite = elementSprites[0];
+        }
+        else if (element == Element.Wood)
+        {
+            spriteRenderer.color = Color.green;
+            childObject.GetComponent<SpriteRenderer>().sprite = elementSprites[1];
+        }
+        else if (element == Element.Water)
+        {
+            spriteRenderer.color = new Color(0f, 0.8f, 1f);
+            childObject.GetComponent<SpriteRenderer>().sprite = elementSprites[2];
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         rigidbody = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        int n = UnityEngine.Random.Range(0, 3);
-        if (n == 0)
-        {
-            spriteRenderer.color = Color.red;
-        }
-        else if (n==1) 
-        {
-            spriteRenderer.color = Color.green;
-        }
-        else
-        {
-            spriteRenderer.color = Color.blue;
-        }
-        Collider2D collider = GetComponent<Collider2D>();
+        freezeSlider.GetComponent<Slider>().maxValue = freezeDuration;
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        // rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
-
-        // Move lsft/right
-        horizontalInput = Input.GetAxis("Horizontal"+inputID);
-        transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput);
-
-        // Jump
-        if (Input.GetKeyDown(jumpKey) && canJump)
+        if (freezeLeft > 0)
         {
-            canJump = false;
-            rigidbody.velocity = new Vector2(0, jumpForce);
+            // Add Freeze state
+            freezeSlider.SetActive(true);
+            freezeLeft -= Time.deltaTime;
         }
-
-        // Color change
-        if (Input.GetKeyDown(colorKey))
+        else
         {
-            if (spriteRenderer.color==Color.red)
+            // Remove Freeze State
+            freezeSlider.SetActive(false);
+            freezeStatus = false;
+
+            // Incincible stste
+            if (invincibleStatus)
             {
-                spriteRenderer.color = Color.blue;
+                if (invincibleLeft > 0)
+                {
+                    invincibleLeft -= Time.deltaTime;
+                }
+                else
+                {
+                    invincibleStatus = false;
+                }
+                if (invincibleStatus)
+                {
+                    blink();
+                }
+                else
+                {
+                    stopBlink();
+                }
             }
-            else if(spriteRenderer.color == Color.blue)
+
+            // Move left/right
+            horizontalInput = Input.GetAxis("Horizontal" + inputID);
+            transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput);
+
+            // Jump
+            if (Input.GetKeyDown(jumpKey) && jumpStatus)
             {
-                spriteRenderer.color = Color.green;
+                jumpStatus = false;
+                rigidbody.velocity = new Vector2(0, jumpForce);
             }
-            else if (spriteRenderer.color == Color.green)
-            {
-                spriteRenderer.color = Color.red;
-            }
+            
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    // When on the platform, player can jump
+    void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform"))
+        GameObject gameObject = collision.gameObject;
+        if (gameObject.CompareTag("Platform"))
         {
             foreach (ContactPoint2D contact in collision.contacts)
             {
-                if (contact.normal.y>0)
+                if (contact.normal.y > 0)
                 {
-                    canJump = true;
+                    jumpStatus = true;
                 }
             }
+        }
+        else if (gameObject.CompareTag("Player"))
+        {
+            freeze(element, gameObject.GetComponent<PlayerController>().element);
+        }
+    }
+
+    // When leaving the platform, player cannot jump
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Platform"))
+        {
+            jumpStatus = false;
         }
     }
 }

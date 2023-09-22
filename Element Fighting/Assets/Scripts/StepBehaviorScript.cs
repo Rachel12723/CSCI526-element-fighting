@@ -28,7 +28,7 @@ public class StepBehaviorScript : MonoBehaviour
     void Update()
     {
         // Check if the step has gone off the top of the screen
-        if (transform.position.y > mainCamera.orthographicSize + transform.localScale.y / 2)
+        if (transform.position.y > mainCamera.orthographicSize + transform.localScale.y)
         {
             Destroy(gameObject);
         }

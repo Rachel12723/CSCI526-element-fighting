@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameController : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class GameController : MonoBehaviour
     public ElementSpawnerScript elementSpawner;
     public GameObject player1;
     public GameObject player2;
+    public GameObject playerText;
 	
 
     // Dictionary to track relationships between steps and their spawned elements
@@ -16,36 +18,130 @@ public class GameController : MonoBehaviour
 	private List<Transform> elementPositions = new List<Transform>();
 
     // Offset to position the element above the step
-    private float offset = 0.9f; 
-	private float disappearDistance = 0.9f; 
+    private float offset = 0.7f; 
+	private float disappearDistance = 0.9f;
 
+    public GameObject menu;
+    private bool gameOver = false;
+    private bool gameStart = false;
+    private KeyCode startKey = KeyCode.Return;
 
-    void Awake()
+    private void allStart()
     {
-        Debug.Log("GameController - Awake");
+        gameStart = true;
+        gameOver = false;
+
+        // Activate Players & Init Players
+        PlayerController playerController;
+        player1.SetActive(true);
+        player1.GetComponent<PlayerController>().init();
+        player1.transform.position = new Vector3(-2.5f, 3, 0);
+        int n1 = UnityEngine.Random.Range(0, 3);
+        playerController = player1.GetComponent<PlayerController>();
+        if (n1 == 0)
+        {
+            playerController.changeElement(Element.Fire);
+        }
+        else if (n1 == 1)
+        {
+            playerController.changeElement(Element.Wood);
+        }
+        else if (n1 == 2)
+        {
+            playerController.changeElement(Element.Water);
+        }
+
+        player2.SetActive(true);
+        player2.GetComponent<PlayerController>().init();
+        player2.transform.position = new Vector3(2.5f, 3, 0);
+        int n2 = UnityEngine.Random.Range(0, 3);
+        while (n2 == n1)
+        {
+            n2 = UnityEngine.Random.Range(0, 3);
+        }
+        if (n2 == 0)
+        {
+            player2.GetComponent<PlayerController>().changeElement(Element.Fire);
+        }
+        else if (n2 == 1)
+        {
+            player2.GetComponent<PlayerController>().changeElement(Element.Wood);
+        }
+        else if (n2 == 2)
+        {
+            player2.GetComponent<PlayerController>().changeElement(Element.Water);
+        }
+
+        // Activate PlayerText
+        playerText.SetActive(true);
+
+        // Destroy the platforms and elements
+        GameObject[] platform = GameObject.FindGameObjectsWithTag("Platform");
+        foreach(GameObject p in platform)
+        {
+            Destroy(p);
+        }
+        GameObject[] element = GameObject.FindGameObjectsWithTag("Element");
+        foreach (GameObject e in element)
+        {
+            Destroy(e);
+        }
+        stepElementPairs.Clear();
+
+        // Init Platforms
+        stepSpawner.InstantiateStepAtPosition(new Vector2(-2.5f, 0));
+        stepSpawner.InstantiateStepAtPosition(new Vector2(2.5f, 0));
+
     }
 
-    void OnEnable()
+    private void isOver()
     {
-        Debug.Log("GameController - OnEnable");
+        if (player1.transform.position.y>=5.6|| player1.transform.position.y <= -5.6 || player2.transform.position.y >= 5.6 || player2.transform.position.y <= -5.6)
+        {
+            // Deactivate Players & Init Players
+            player1.SetActive(false);
+            player1.transform.position = new Vector3(-2.5f, 10, 0);
+            player2.SetActive(false);
+            player2.transform.position = new Vector3(2.5f, 10, 0);
+            // Deactivate PlayerText
+            playerText.SetActive(false);
+
+            // Active Menu and present result
+            if (player1.transform.position.y >= 5.6 || player1.transform.position.y <= -5.6)
+            {
+                menu.transform.GetChild(1).GetComponent<TMP_Text>().text = "Game Over!\nPlayer2 Wins!";
+            }
+            else
+            {
+                menu.transform.GetChild(1).GetComponent<TMP_Text>().text = "Game Over!\nPlayer1 Wins!";
+            }
+            menu.SetActive(true);
+
+            gameOver = true;
+            gameStart = false;
+        }
+
     }
 
     private void HandleStepSpawned(GameObject step)
     {
         // Get the currently assigned player elements
-        List<string> playerElements = new List<string>
+        List<Element> playerElements = new List<Element>
         {
-            player1.GetComponent<PlayerElementScript>().playerElement,
-            player2.GetComponent<PlayerElementScript>().playerElement
+            player1.GetComponent<PlayerController>().element,
+            player2.GetComponent<PlayerController>().element
         };
 
-        // Ask the ElementSpawnerScript to try adding an element to this step
-        GameObject spawnedElement = elementSpawner.TrySpawnElementOnStep(step, playerElements);
-
-        // If an element was spawned, register the relationship
-        if (spawnedElement != null)
+        if (stepElementPairs.Count == 0)
         {
-            RegisterStepElementPair(step, spawnedElement);
+            // Ask the ElementSpawnerScript to try adding an element to this step
+            GameObject spawnedElement = elementSpawner.TrySpawnElementOnStep(step, playerElements);
+
+            // If an element was spawned, register the relationship
+            if (spawnedElement != null)
+            {
+                RegisterStepElementPair(step, spawnedElement);
+            }
         }
     }
 
@@ -86,13 +182,22 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("GameController - Start");
+        menu.transform.GetChild(1).GetComponent<TMP_Text>().text = "Element Fighting";
+        menu.SetActive(true);
         stepSpawner.OnStepSpawned += HandleStepSpawned;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!gameStart)
+        {
+            if (Input.GetKeyDown(startKey))
+            {
+                menu.SetActive(false);
+                allStart();
+            }
+        }
         UpdateElementPositions();
 		foreach (var pair in stepElementPairs)
         {
@@ -106,11 +211,21 @@ public class GameController : MonoBehaviour
 			if (distance1 < disappearDistance || distance2 < disappearDistance)
 			{
 				// destroy the one that is near to the player and update the stepElementPairs
-				Destroy(element);
+                if (distance1 < disappearDistance)
+                {
+                    player1.GetComponent<PlayerController>().changeElement(element.GetComponent<ElementScript>().elementType);
+                }
+                else if(distance2 < disappearDistance)
+                {
+                    player2.GetComponent<PlayerController>().changeElement(element.GetComponent<ElementScript>().elementType);
+                }
 				stepElementPairs.Remove(step);
-
-			}
+				Destroy(element);
+            }
 		}
-		
+        if (gameStart && !gameOver)
+        {
+            isOver();
+        }
     }
 }
