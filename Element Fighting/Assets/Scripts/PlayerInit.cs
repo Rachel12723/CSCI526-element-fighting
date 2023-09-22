@@ -35,6 +35,8 @@ public class PlayerInit : MonoBehaviour
         {
             n2 = UnityEngine.Random.Range(0, 3);
         }
+        player1.transform.position = new Vector3(-2, 3, 0);
+        player2.transform.position = new Vector3(2, 3, 0);
         initElement(player1, n1);
         initElement(player2, n2);
     }

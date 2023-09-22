@@ -19,7 +19,7 @@ public class PlayerFrozenTimer : MonoBehaviour
         Vector2 targetPosition = target.position;
 
         GetComponent<RectTransform>().position = targetPosition + new Vector2(0, 0.7f);
-        if (freezeLeft > 0)
+        if (freezeLeft >= 0)
         {
             freezeLeft -= Time.deltaTime;
             GetComponent<Slider>().value = freezeLeft;

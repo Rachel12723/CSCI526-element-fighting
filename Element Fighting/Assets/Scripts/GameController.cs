@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour
     public ElementSpawnerScript elementSpawner;
     public GameObject player1;
     public GameObject player2;
+    public GameObject playerText;
 	
 
     // Dictionary to track relationships between steps and their spawned elements
@@ -22,11 +23,90 @@ public class GameController : MonoBehaviour
 
     public GameObject menu;
     private bool gameOver = false;
+    private bool gameStart = false;
+    private KeyCode startKey = KeyCode.Return;
+
+    private void allStart()
+    {
+        gameStart = true;
+        gameOver = false;
+
+        // Activate Players & Init Players
+        PlayerController playerController;
+        player1.SetActive(true);
+        player1.GetComponent<PlayerController>().init();
+        player1.transform.position = new Vector3(-2.5f, 3, 0);
+        int n1 = UnityEngine.Random.Range(0, 3);
+        playerController = player1.GetComponent<PlayerController>();
+        if (n1 == 0)
+        {
+            playerController.changeElement(Element.Fire);
+        }
+        else if (n1 == 1)
+        {
+            playerController.changeElement(Element.Wood);
+        }
+        else if (n1 == 2)
+        {
+            playerController.changeElement(Element.Water);
+        }
+
+        player2.SetActive(true);
+        player2.GetComponent<PlayerController>().init();
+        player2.transform.position = new Vector3(2.5f, 3, 0);
+        int n2 = UnityEngine.Random.Range(0, 3);
+        while (n2 == n1)
+        {
+            n2 = UnityEngine.Random.Range(0, 3);
+        }
+        if (n2 == 0)
+        {
+            player2.GetComponent<PlayerController>().changeElement(Element.Fire);
+        }
+        else if (n2 == 1)
+        {
+            player2.GetComponent<PlayerController>().changeElement(Element.Wood);
+        }
+        else if (n2 == 2)
+        {
+            player2.GetComponent<PlayerController>().changeElement(Element.Water);
+        }
+
+        // Activate PlayerText
+        playerText.SetActive(true);
+
+        // Destroy the platforms and elements
+        GameObject[] platform = GameObject.FindGameObjectsWithTag("Platform");
+        foreach(GameObject p in platform)
+        {
+            Destroy(p);
+        }
+        GameObject[] element = GameObject.FindGameObjectsWithTag("Element");
+        foreach (GameObject e in element)
+        {
+            Destroy(e);
+        }
+        stepElementPairs.Clear();
+
+        // Init Platforms
+        stepSpawner.InstantiateStepAtPosition(new Vector2(-2.5f, 0));
+        stepSpawner.InstantiateStepAtPosition(new Vector2(2.5f, 0));
+
+    }
 
     private void isOver()
     {
         if (player1.transform.position.y>=5.6|| player1.transform.position.y <= -5.6 || player2.transform.position.y >= 5.6 || player2.transform.position.y <= -5.6)
         {
+            // Deactivate Players & Init Players
+            player1.SetActive(false);
+            player1.transform.position = new Vector3(-2.5f, 10, 0);
+            player2.SetActive(false);
+            player2.transform.position = new Vector3(2.5f, 10, 0);
+            // Deactivate PlayerText
+            playerText.SetActive(false);
+
+            // Active Menu and present result
             if (player1.transform.position.y >= 5.6 || player1.transform.position.y <= -5.6)
             {
                 menu.transform.GetChild(1).GetComponent<TMP_Text>().text = "Game Over!\nPlayer2 Wins!";
@@ -35,23 +115,12 @@ public class GameController : MonoBehaviour
             {
                 menu.transform.GetChild(1).GetComponent<TMP_Text>().text = "Game Over!\nPlayer1 Wins!";
             }
-            stepSpawner.GetComponent<StepSpawnerScript>().gameOver = true;
-            player1.GetComponent<PlayerController>().gameOver = true;
-            player2.GetComponent<PlayerController>().gameOver = true;
-            gameOver = true;
             menu.SetActive(true);
+
+            gameOver = true;
+            gameStart = false;
         }
 
-    }
-
-    void Awake()
-    {
-        Debug.Log("GameController - Awake");
-    }
-
-    void OnEnable()
-    {
-        Debug.Log("GameController - OnEnable");
     }
 
     private void HandleStepSpawned(GameObject step)
@@ -113,13 +182,22 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("GameController - Start");
+        menu.transform.GetChild(1).GetComponent<TMP_Text>().text = "Element Fighting";
+        menu.SetActive(true);
         stepSpawner.OnStepSpawned += HandleStepSpawned;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!gameStart)
+        {
+            if (Input.GetKeyDown(startKey))
+            {
+                menu.SetActive(false);
+                allStart();
+            }
+        }
         UpdateElementPositions();
 		foreach (var pair in stepElementPairs)
         {
@@ -145,7 +223,7 @@ public class GameController : MonoBehaviour
 				Destroy(element);
             }
 		}
-        if (!gameOver)
+        if (gameStart && !gameOver)
         {
             isOver();
         }

@@ -19,16 +19,25 @@ public class PlayerController : MonoBehaviour
     public List<Sprite> elementSprites;
 
     public float freezeDuration = 2;
-    public float freezeLeft = 0;
-    public bool freezeStatus = false;
+    private float freezeLeft = 0;
+    private bool freezeStatus = false;
     public GameObject freezeSlider;
 
     public float invincibleDuration = 2;
-    public float invincibleLeft = 0;
-    public bool invincibleStatus = false;
+    private float invincibleLeft = 0;
+    private bool invincibleStatus = false;
     private bool invincibleBlink = false;
 
-    public bool gameOver = false;
+
+    public void init()
+    {
+        jumpStatus = false;
+        freezeLeft = 0;
+        freezeStatus = false;
+        invincibleLeft = 0;
+        invincibleStatus = false;
+        invincibleBlink = false;
+    }
 
     private void blink()
     {
@@ -75,6 +84,7 @@ public class PlayerController : MonoBehaviour
     {
         this.element = element;
         Transform childObject = transform.GetChild(0);
+        spriteRenderer = GetComponent<SpriteRenderer>();
         if (element == Element.Fire)
         {
             spriteRenderer.color = Color.red;
@@ -136,19 +146,17 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            if (!gameOver)
-            { 
-                // Move left/right
-                horizontalInput = Input.GetAxis("Horizontal" + inputID);
-                transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput);
+            // Move left/right
+            horizontalInput = Input.GetAxis("Horizontal" + inputID);
+            transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput);
 
-                // Jump
-                if (Input.GetKeyDown(jumpKey) && jumpStatus)
-                {
-                    jumpStatus = false;
-                    rigidbody.velocity = new Vector2(0, jumpForce);
-                }
+            // Jump
+            if (Input.GetKeyDown(jumpKey) && jumpStatus)
+            {
+                jumpStatus = false;
+                rigidbody.velocity = new Vector2(0, jumpForce);
             }
+            
         }
     }
 
