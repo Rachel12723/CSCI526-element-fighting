@@ -28,6 +28,8 @@ public class PlayerController : MonoBehaviour
     public bool invincibleStatus = false;
     private bool invincibleBlink = false;
 
+    public bool gameOver = false;
+
     private void blink()
     {
         Color color = spriteRenderer.color;
@@ -134,15 +136,18 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            // Move left/right
-            horizontalInput = Input.GetAxis("Horizontal" + inputID);
-            transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput);
+            if (!gameOver)
+            { 
+                // Move left/right
+                horizontalInput = Input.GetAxis("Horizontal" + inputID);
+                transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput);
 
-            // Jump
-            if (Input.GetKeyDown(jumpKey) && jumpStatus)
-            {
-                jumpStatus = false;
-                rigidbody.velocity = new Vector2(0, jumpForce);
+                // Jump
+                if (Input.GetKeyDown(jumpKey) && jumpStatus)
+                {
+                    jumpStatus = false;
+                    rigidbody.velocity = new Vector2(0, jumpForce);
+                }
             }
         }
     }

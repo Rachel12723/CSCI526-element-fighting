@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameController : MonoBehaviour
 {
@@ -17,8 +18,31 @@ public class GameController : MonoBehaviour
 
     // Offset to position the element above the step
     private float offset = 0.7f; 
-	private float disappearDistance = 0.9f; 
+	private float disappearDistance = 0.9f;
 
+    public GameObject menu;
+    private bool gameOver = false;
+
+    private void isOver()
+    {
+        if (player1.transform.position.y>=5.6|| player1.transform.position.y <= -5.6 || player2.transform.position.y >= 5.6 || player2.transform.position.y <= -5.6)
+        {
+            if (player1.transform.position.y >= 5.6 || player1.transform.position.y <= -5.6)
+            {
+                menu.transform.GetChild(1).GetComponent<TMP_Text>().text = "Game Over!\nPlayer2 Wins!";
+            }
+            else
+            {
+                menu.transform.GetChild(1).GetComponent<TMP_Text>().text = "Game Over!\nPlayer1 Wins!";
+            }
+            stepSpawner.GetComponent<StepSpawnerScript>().gameOver = true;
+            player1.GetComponent<PlayerController>().gameOver = true;
+            player2.GetComponent<PlayerController>().gameOver = true;
+            gameOver = true;
+            menu.SetActive(true);
+        }
+
+    }
 
     void Awake()
     {
@@ -121,6 +145,9 @@ public class GameController : MonoBehaviour
 				Destroy(element);
             }
 		}
-		
+        if (!gameOver)
+        {
+            isOver();
+        }
     }
 }

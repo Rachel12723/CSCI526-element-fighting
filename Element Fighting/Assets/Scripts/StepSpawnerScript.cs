@@ -13,6 +13,7 @@ public class StepSpawnerScript : MonoBehaviour
 
     private float nextSpawnTime;
     private float stepHalfWidth; // Half width of the step
+    public bool gameOver = false;
 
     // Start is called before the first frame update
     void Start()
@@ -31,7 +32,7 @@ public class StepSpawnerScript : MonoBehaviour
 
     private void Update()
     {
-        if (Time.time > nextSpawnTime)
+        if (!gameOver && Time.time > nextSpawnTime)
         {
             SpawnStep();
             nextSpawnTime = Time.time + spawnRate;

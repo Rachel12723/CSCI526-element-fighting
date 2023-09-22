@@ -13,15 +13,9 @@ public class PlayerIndicator : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
-        // 获取目标物体的世界坐标
         Vector2 targetPosition = target.position;
-
-        // 将目标物体的世界坐标转换为屏幕坐标
-        Vector2 screenPosition = Camera.main.WorldToScreenPoint(targetPosition);
-
-        // 更新UI Text的位置
-        GetComponent<RectTransform>().position = screenPosition + new Vector2(80, 50);
+        GetComponent<RectTransform>().position = targetPosition+new Vector2(1.5f, 1);
     }
 }
