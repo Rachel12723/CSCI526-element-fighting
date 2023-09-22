@@ -7,11 +7,13 @@ public class PlayerInit : MonoBehaviour
 
     public GameObject player1;
     public GameObject player2;
+    public List<Sprite> elementSprites;
 
     private void initElement(GameObject player, int n)
     {
         SpriteRenderer spriteRenderer = player.GetComponent<SpriteRenderer>();
         PlayerController playerController = player.GetComponent<PlayerController>();
+        Transform childObject = playerController.transform.GetChild(0);
         if (n == 0)
         {
             spriteRenderer.color = Color.red;
@@ -27,6 +29,7 @@ public class PlayerInit : MonoBehaviour
             spriteRenderer.color = Color.blue;
             playerController.element = Element.Water;
         }
+        childObject.GetComponent<SpriteRenderer>().sprite = elementSprites[n];
     }
 
     // Start is called before the first frame update

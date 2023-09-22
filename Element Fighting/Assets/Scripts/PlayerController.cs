@@ -16,37 +16,77 @@ public class PlayerController : MonoBehaviour
 
     private SpriteRenderer spriteRenderer;
     public Element element;
+    public List<Sprite> elementSprites;
 
     public float freezeDuration = 2;
     public float freezeLeft = 0;
     public bool freezeStatus = false;
     public GameObject freezeSlider;
 
+    public float invincibleDuration = 2;
+    public float invincibleLeft = 0;
+    public bool invincibleStatus = false;
+    private bool invincibleBlink = false;
+
+    private void blink()
+    {
+        Color color = spriteRenderer.color;
+        if (color.a >= 1f)
+        {
+            invincibleBlink = false;
+        }
+        if(color.a <= 0.4f)
+        {
+            invincibleBlink = true;
+        }
+        if (invincibleBlink)
+        {
+            color.a += Time.deltaTime * 1.8f;
+        }
+        else
+        {
+            color.a -= Time.deltaTime * 1.8f;
+        }
+        spriteRenderer.color = color;
+    }
+
+    private void stopBlink()
+    {
+        Color color = spriteRenderer.color;
+        color.a = 1f;
+        spriteRenderer.color = color;
+    }
 
     private void freeze(Element element1,Element element2)
     {
-        if(!freezeStatus && ((element1==Element.Fire && element2 == Element.Water)|| (element1 == Element.Wood && element2 == Element.Fire)|| (element1 == Element.Water && element2 == Element.Wood)))
+        if(!invincibleStatus && !freezeStatus && ((element1==Element.Fire && element2 == Element.Water)|| (element1 == Element.Wood && element2 == Element.Fire)|| (element1 == Element.Water && element2 == Element.Wood)))
         {
             freezeLeft = freezeDuration;
             freezeSlider.GetComponent<PlayerFrozenTimer>().freezeLeft = freezeDuration;
             freezeStatus = true;
+            invincibleLeft = invincibleDuration;
+            invincibleStatus = true;
         }
     }
 
     public void changeElement(Element element)
     {
         this.element = element;
+        Transform childObject = transform.GetChild(0);
         if (element == Element.Fire)
         {
             spriteRenderer.color = Color.red;
+            childObject.GetComponent<SpriteRenderer>().sprite = elementSprites[0];
         }
         else if (element == Element.Wood)
         {
             spriteRenderer.color = Color.green;
+            childObject.GetComponent<SpriteRenderer>().sprite = elementSprites[1];
         }
         else if (element == Element.Water)
         {
             spriteRenderer.color = Color.blue;
+            childObject.GetComponent<SpriteRenderer>().sprite = elementSprites[2];
         }
     }
 
@@ -61,10 +101,38 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (freezeLeft<=0)
+        if (freezeLeft > 0)
         {
+            // Add Freeze state
+            freezeSlider.SetActive(true);
+            freezeLeft -= Time.deltaTime;
+        }
+        else
+        {
+            // Remove Freeze State
             freezeSlider.SetActive(false);
             freezeStatus = false;
+
+            // Incincible stste
+            if (invincibleStatus)
+            {
+                if (invincibleLeft > 0)
+                {
+                    invincibleLeft -= Time.deltaTime;
+                }
+                else
+                {
+                    invincibleStatus = false;
+                }
+                if (invincibleStatus)
+                {
+                    blink();
+                }
+                else
+                {
+                    stopBlink();
+                }
+            }
 
             // Move left/right
             horizontalInput = Input.GetAxis("Horizontal" + inputID);
@@ -76,11 +144,6 @@ public class PlayerController : MonoBehaviour
                 jumpStatus = false;
                 rigidbody.velocity = new Vector2(0, jumpForce);
             }
-        }
-        else
-        {
-            freezeSlider.SetActive(true);
-            freezeLeft -= Time.deltaTime;
         }
     }
 
