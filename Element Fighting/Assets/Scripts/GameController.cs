@@ -98,15 +98,8 @@ public class GameController : MonoBehaviour
     {
         if (player1.transform.position.y>=5.6|| player1.transform.position.y <= -5.6 || player2.transform.position.y >= 5.6 || player2.transform.position.y <= -5.6)
         {
-            // Deactivate Players & Init Players
-            player1.SetActive(false);
-            player1.transform.position = new Vector3(-2.5f, 10, 0);
-            player2.SetActive(false);
-            player2.transform.position = new Vector3(2.5f, 10, 0);
-            // Deactivate PlayerText
-            playerText.SetActive(false);
 
-            // Active Menu and present result
+            // Activate Menu and present result
             if (player1.transform.position.y >= 5.6 || player1.transform.position.y <= -5.6)
             {
                 menu.transform.GetChild(1).GetComponent<TMP_Text>().text = "Game Over!\nPlayer2 Wins!";
@@ -116,6 +109,14 @@ public class GameController : MonoBehaviour
                 menu.transform.GetChild(1).GetComponent<TMP_Text>().text = "Game Over!\nPlayer1 Wins!";
             }
             menu.SetActive(true);
+
+            // Deactivate Players & Init Players
+            player1.SetActive(false);
+            player1.transform.position = new Vector3(-2.5f, 10, 0);
+            player2.SetActive(false);
+            player2.transform.position = new Vector3(2.5f, 10, 0);
+            // Deactivate PlayerText
+            playerText.SetActive(false);
 
             gameOver = true;
             gameStart = false;
