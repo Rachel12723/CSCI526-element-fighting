@@ -11,25 +11,19 @@ public class PlayerInit : MonoBehaviour
 
     private void initElement(GameObject player, int n)
     {
-        SpriteRenderer spriteRenderer = player.GetComponent<SpriteRenderer>();
         PlayerController playerController = player.GetComponent<PlayerController>();
-        Transform childObject = playerController.transform.GetChild(0);
         if (n == 0)
         {
-            spriteRenderer.color = Color.red;
-            playerController.element = Element.Fire;
+            playerController.changeElement(Element.Fire);
         }
         else if (n == 1)
         {
-            spriteRenderer.color = Color.green;
-            playerController.element = Element.Wood;
+            playerController.changeElement(Element.Wood);
         }
         else if(n == 2)
         {
-            spriteRenderer.color = Color.blue;
-            playerController.element = Element.Water;
+            playerController.changeElement(Element.Water);
         }
-        childObject.GetComponent<SpriteRenderer>().sprite = elementSprites[n];
     }
 
     // Start is called before the first frame update

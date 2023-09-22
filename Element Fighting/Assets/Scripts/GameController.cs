@@ -16,7 +16,7 @@ public class GameController : MonoBehaviour
 	private List<Transform> elementPositions = new List<Transform>();
 
     // Offset to position the element above the step
-    private float offset = 0.9f; 
+    private float offset = 0.7f; 
 	private float disappearDistance = 0.9f; 
 
 

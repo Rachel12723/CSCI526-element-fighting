@@ -35,17 +35,17 @@ public class PlayerController : MonoBehaviour
         {
             invincibleBlink = false;
         }
-        if(color.a <= 0.4f)
+        if(color.a <= 0.3f)
         {
             invincibleBlink = true;
         }
         if (invincibleBlink)
         {
-            color.a += Time.deltaTime * 1.8f;
+            color.a += Time.deltaTime * 2.1f;
         }
         else
         {
-            color.a -= Time.deltaTime * 1.8f;
+            color.a -= Time.deltaTime * 2.1f;
         }
         spriteRenderer.color = color;
     }
@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (element == Element.Water)
         {
-            spriteRenderer.color = Color.blue;
+            spriteRenderer.color = new Color(0f, 0.8f, 1f);
             childObject.GetComponent<SpriteRenderer>().sprite = elementSprites[2];
         }
     }
